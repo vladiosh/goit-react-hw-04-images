@@ -14,7 +14,6 @@ const SearchBar = ({ onSubmit }) => {
 
   const handleChange = event => {
     setSearchName(event.currentTarget.value.toLowerCase());
-    // this.setState({ searchName: event.currentTarget.value.toLowerCase() });
   };
 
   const handleSubmit = event => {
