@@ -5,59 +5,55 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 import { BiSearchAlt } from 'react-icons/bi';
-import { Component } from 'react';
-import React from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import PropTypes from 'prop-types';
 
-class SearchBar extends Component {
-  state = {
-    searchName: '',
+const SearchBar = ({ onSubmit }) => {
+  const [searchName, setSearchName] = useState('');
+
+  const handleChange = event => {
+    setSearchName(event.currentTarget.value.toLowerCase());
+    // this.setState({ searchName: event.currentTarget.value.toLowerCase() });
   };
 
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-  };
-
-  handleChange = event => {
-    this.setState({ searchName: event.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
-    if (this.state.searchName.trim() === '') {
+    if (searchName.trim() === '') {
       toast.error('Fill in the search field');
 
       return;
     }
-    this.props.onSubmit(this.state.searchName);
+    onSubmit(searchName);
 
-    this.setState({ searchName: '' });
+    setSearchName('');
   };
 
-  render() {
-    return (
-      <Bar>
-        <SearchForm onSubmit={this.handleSubmit}>
-          <SearchFormButton type="submit">
-            <span>
-              <BiSearchAlt size="25px" />
-            </span>
-          </SearchFormButton>
+  return (
+    <Bar>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchFormButton type="submit">
+          <span>
+            <BiSearchAlt size="25px" />
+          </span>
+        </SearchFormButton>
 
-          <SearchFormInput
-            value={this.state.searchName}
-            onChange={this.handleChange}
-            className="input"
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-          />
-        </SearchForm>
-      </Bar>
-    );
-  }
-}
+        <SearchFormInput
+          value={searchName}
+          onChange={handleChange}
+          className="input"
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+        />
+      </SearchForm>
+    </Bar>
+  );
+};
 
 export default SearchBar;
+
+SearchBar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
