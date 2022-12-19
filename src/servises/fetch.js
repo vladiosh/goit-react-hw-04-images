@@ -8,5 +8,14 @@ export const fetchImages = async (query, page) => {
     `?q=${query}&key=${API_KEY}&page=${page}&image_type=photo&orientation=horizontal&per_page=12`
   );
 
-  return response.data.hits;
+  const dataImage = response.data.hits.map(
+    ({ id, tags, webformatURL, largeImageURL }) => ({
+      id,
+      tags,
+      webformatURL,
+      largeImageURL,
+    })
+  );
+
+  return dataImage;
 };

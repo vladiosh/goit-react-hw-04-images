@@ -1,5 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Container } from './App.styled';
 import toast, { Toaster } from 'react-hot-toast';
 import { fetchImages } from '../../servises/fetch';
@@ -8,21 +7,16 @@ import SearchBar from '../Searchbar/Searchbar';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Button from 'components/Button/Button';
 
-class App extends Component {
-  state = {
-    searchName: '',
-    images: [],
-    page: 1,
-    loading: false,
-    error: null,
-  };
+const App = () => {
+  const [searchName, setSearchName] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  async componentDidUpdate(_, prevState) {
-    const { searchName, page } = this.state;
-
-    if (prevState.searchName !== searchName || prevState.page !== page) {
+  useEffect(() => {
+    const getImages = async () => {
       try {
-        this.setState({ loading: true });
+        setLoading(true);
 
         const searchImages = await fetchImages(searchName, page);
 
@@ -32,60 +26,51 @@ class App extends Component {
           );
         }
 
-        this.setState(({ images }) => {
-          return {
-            images: [...images, ...searchImages],
-          };
+        setImages(prevImages => {
+          return [...prevImages, ...searchImages];
         });
       } catch (error) {
         toast.error('Something went wrong');
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
-    }
-  }
+    };
+    getImages();
+  }, [searchName, page]);
 
-  handleFormSubmit = searchName => {
-    this.setState({
-      searchName,
-      images: [],
-      page: 1,
-    });
+  const handleFormSubmit = searchName => {
+    setImages([]);
+    setPage(1);
+    setSearchName(searchName);
   };
 
-  loadMoreSubmit = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const loadMoreSubmit = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  render() {
-    const { images, loading } = this.state;
+  return (
+    <Container>
+      <SearchBar onSubmit={handleFormSubmit} />
 
-    return (
-      <Container>
-        <SearchBar onSubmit={this.handleFormSubmit} />
+      {images.length > 0 && <ImageGallery images={images} />}
 
-        {images.length > 0 && <ImageGallery images={images} />}
+      {loading && (
+        <ThreeDots
+          height="80"
+          width="80"
+          radius="9"
+          color="#3f51b5"
+          ariaLabel="three-dots-loading"
+          wrapperStyle={{ justifyContent: 'center' }}
+          wrapperClassName=""
+          visible={true}
+        />
+      )}
+      {images.length > 0 && <Button onClick={loadMoreSubmit} />}
 
-        {loading && (
-          <ThreeDots
-            height="80"
-            width="80"
-            radius="9"
-            color="#3f51b5"
-            ariaLabel="three-dots-loading"
-            wrapperStyle={{ justifyContent: 'center' }}
-            wrapperClassName=""
-            visible={true}
-          />
-        )}
-        {images.length > 0 && <Button onClick={this.loadMoreSubmit} />}
-
-        <Toaster position="top-right" reverseOrder={false} />
-      </Container>
-    );
-  }
-}
+      <Toaster position="top-right" reverseOrder={false} />
+    </Container>
+  );
+};
 
 export default App;
