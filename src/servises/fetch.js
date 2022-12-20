@@ -16,6 +16,5 @@ export const fetchImages = async (query, page) => {
       largeImageURL,
     })
   );
-
   return dataImage;
 };

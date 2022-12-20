@@ -14,6 +14,10 @@ const App = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (searchName === '') {
+      return;
+    }
+
     const getImages = async () => {
       try {
         setLoading(true);
